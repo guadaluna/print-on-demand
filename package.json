@@ -1,0 +1,12 @@
+{
+  "name": "printondemand",
+  "version": "1.0.0",
+  "description": "Proyecto de tienda online de productos personalizables.",
+  "license": "ISC",
+  "author": "Guadalupe Luna",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}

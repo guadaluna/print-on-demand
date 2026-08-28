@@ -1,0 +1,82 @@
+[
+   {
+        "id": 1,
+        "idCliente": 1,
+        "fecha": "2026-08-28",
+        "estado": "Pendiente",
+        "total": 46000,
+        "metodoEntrega": "Envio a domicilio",
+        "codigoPostal": "5000",
+        "productos": 
+        [
+            {
+                "idProducto": 1,
+                "cantidad": 2
+            }
+        ]
+    },
+    {
+        "id": 2,
+        "idCliente": 2,
+        "fecha": "2026-08-26",
+        "estado": "Confirmado",
+        "total": 15000,
+        "metodoEntrega": "Retiro",
+        "codigoPostal": "",
+        "productos": 
+        [
+            {
+                "idProducto": 5,
+                "cantidad": 1
+            }
+        ]
+    },
+    {
+        "id": 3,
+        "idCliente": 5,
+        "fecha": "2026-08-27",
+        "estado": "Pendiente",
+        "total": 40000,
+        "metodoEntrega": "Envio a domicilio",
+        "codigoPostal": "2800",
+        "productos": 
+        [
+            {
+                "idProducto": 3,
+                "cantidad": 1
+            }
+        ]
+    },
+    {
+        "id": 4,
+        "idCliente": 3,
+        "fecha": "2026-08-25",
+        "estado": "Confirmado",
+        "total": 37000,
+        "metodoEntrega": "Retiro",
+        "codigoPostal": "",
+        "productos": 
+        [
+            {
+                "idProducto": 4,
+                "cantidad": 1
+            }
+        ]
+    },
+    {
+        "id": 5,
+        "idCliente": 4,
+        "fecha": "2026-08-25",
+        "estado": "Confirmado",
+        "total": 20000,
+        "metodoEntrega": "Retiro",
+        "codigoPostal": "",
+        "productos": 
+        [
+            {
+                "idProducto": 6,
+                "cantidad": 2
+            }
+        ]
+    }
+]

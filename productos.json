@@ -1,0 +1,69 @@
+[
+    {
+        "id": 1,
+        "nombre": "Remera clásica",
+        "categoria": "Remera",
+        "descripcion": "Remera de algodón con diseño estampado en DTF.",
+        "precio": 23000,
+        "stock": 15,
+        "talles":["S", "M", "L", "XL"],
+        "personalizable": true,
+        "disponible": true
+    },
+    {
+        "id": 2,
+        "nombre": "Remera Overzised",
+        "categoria": "Remera",
+        "descripcion": "Remera Oversized de algodón con diseño estampado en DTF.",
+        "precio": 25000,
+        "stock": 10,
+        "talles":["S", "M", "L", "XL"],
+        "personalizable": true,
+        "disponible": true
+    },
+    {
+        "id": 3,
+        "nombre": "Buzo canguro",
+        "categoria": "Buzo",
+        "descripcion": "Buzo canguro con diseño estampado en DTF.",
+        "precio": 40000,
+        "stock": 7,
+        "talles":["S", "M", "L", "XL"],
+        "personalizable": true,
+        "disponible": true
+    },
+    {
+        "id": 4,
+        "nombre": "Buzo clásico",
+        "categoria": "Buzo",
+        "descripcion": "Buzo clásico con diseño estampado en DTF.",
+        "precio": 37000,
+        "stock": 9,
+        "talles":["S", "M", "L", "XL"],
+        "personalizable": true,
+        "disponible": true
+    },
+    {
+        "id": 5,
+        "nombre": "Taza cerámica",
+        "categoria": "Taza",
+        "descripcion": "Taza de cerámica con diseño sublimado.",
+        "precio": 15000,
+        "stock": 15,
+        "talles":[],
+        "personalizable": true,
+        "disponible": true
+    },
+    {
+        "id": 6,
+        "nombre": "Gorra trucker",
+        "categoria": "Gorra",
+        "descripcion": "Gorra trucker con diseño sublimado.",
+        "precio": 10000,
+        "stock": 15,
+        "talles":[],
+        "personalizable": true,
+        "disponible": true
+    }
+    
+]
