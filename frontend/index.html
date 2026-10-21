@@ -1,0 +1,66 @@
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PrintOnDemand | Tienda</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <header class="encabezado">
+        <a href="index.html" class="logo">Print<span>OnDemand</span></a>
+
+        <nav>
+            <a href="#productos">Productos</a>
+            <a href="#categorias">Categorías</a>
+            <a href="#carrito">Carrito <span id="cantidad-carrito">0</span></a>
+        </nav>
+    </header>
+
+    <main>
+        <section class="portada">
+            <p class="etiqueta">TU ESTILO, TU DISEÑO</p>
+            <h1>Diseñá tu estilo.<br>Hacelo realidad.</h1>
+            <p>Remeras, buzos, tazas y accesorios personalizables.</p>
+            <a href="#productos" class="boton">Explorar productos</a>
+        </section>
+
+        <section id="categorias" class="seccion-productos">
+            <div class="titulo-seccion">
+                <div>
+                    <p class="etiqueta">ENCONTRÁ TU ESTILO</p>
+                    <h2>Nuestros productos</h2>
+                </div>
+
+                <label for="filtro-categoria">Categoría:</label>
+                <select id="filtro-categoria">
+                    <option value="todos">Todas las categorías</option>
+                </select>
+            </div>
+
+            <div id="productos" class="grilla-productos">
+                <p>Cargando productos...</p>
+            </div>
+        </section>
+
+        <section id="carrito" class="seccion-carrito">
+            <h2>Tu carrito</h2>
+            <div id="contenido-carrito">
+                <p>Tu carrito está vacío.</p>
+            </div>
+            <p>Total: $<span id="total-carrito">0</span></p>
+            <button id="finalizar-compra" class="boton" disabled>
+                Finalizar compra
+            </button>
+            <p id="mensaje-carrito" role="status"></p>
+        </section>
+    </main>
+
+    <footer>
+        <p>PrintOnDemand · Diseños que hablan de vos.</p>
+    </footer>
+
+    <script src="js/app.js"></script>
+</body>
+</html>
