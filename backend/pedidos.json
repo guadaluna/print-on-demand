@@ -423,5 +423,20 @@
         "cantidad": 1
       }
     ]
+  },
+  {
+    "id": 28,
+    "idCliente": 28,
+    "fecha": "2026-10-21",
+    "estado": "Pendiente",
+    "total": 10000,
+    "metodoEntrega": "Retiro por el local",
+    "codigoPostal": "5000",
+    "productos": [
+      {
+        "idProducto": 6,
+        "cantidad": 1
+      }
+    ]
   }
 ]

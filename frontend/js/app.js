@@ -325,7 +325,6 @@ formularioCliente.addEventListener("submit", async (evento) => {
     try {
         const datosFormulario = new FormData(formularioCliente);
 
-        // 1. Registrar al cliente
         const respuestaCliente = await fetch(`${API_URL}/clientes`, {
             method: "POST",
             headers: {

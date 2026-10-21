@@ -137,6 +137,21 @@ app.post("/pedidos", async (req, res) => {
         });
     }
 
+    const stockDisponible = productosPedido.every(item => {
+    const producto = productos.find(
+        producto => producto.id === Number(item.idProducto)
+    );
+
+    return producto.disponible &&
+        item.cantidad <= producto.stock;
+    });
+
+    if (!stockDisponible) {
+        return res.status(400).json({
+            mensaje: "No hay stock suficiente para uno o más productos"
+        });
+    }
+
     if (
         typeof total !== "number" ||
         !Number.isFinite(total) ||
@@ -147,6 +162,8 @@ app.post("/pedidos", async (req, res) => {
             mensaje: "El total y el método de entrega son obligatorios"
         });
     }
+
+    const productosOriginales = JSON.parse(JSON.stringify(productos));
 
     const nuevoPedido = {
         id: siguienteId(pedidos),
@@ -162,7 +179,36 @@ app.post("/pedidos", async (req, res) => {
         }))
     };
 
+    productosPedido.forEach(item => {
+        const producto = productos.find(
+            producto => producto.id === Number(item.idProducto)
+        );
+
+        producto.stock -= item.cantidad;
+    });
+
     pedidos.push(nuevoPedido);
+
+    try {
+        await guardarJSON("productos.json", productos);
+        await guardarJSON("pedidos.json", pedidos);
+
+        res.status(201).json(nuevoPedido);
+    } catch (error) {
+        productos.splice(0, productos.length, ...productosOriginales);
+        pedidos.pop();
+
+        try {
+            await guardarJSON("productos.json", productos);
+            await guardarJSON("pedidos.json", pedidos);
+        } catch (errorRestauracion) {
+            console.error("Error al restaurar los archivos JSON:", errorRestauracion);
+        }
+
+        res.status(500).json({
+            mensaje: "Error al guardar el pedido o actualizar el stock"
+        });
+    }
 
     try {
         await guardarJSON("pedidos.json", pedidos);
