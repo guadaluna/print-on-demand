@@ -88,5 +88,340 @@
         "cantidad": 2
       }
     ]
+  },
+  {
+    "id": 7,
+    "idCliente": 7,
+    "fecha": "2026-10-21",
+    "estado": "Pendiente",
+    "total": 86000,
+    "metodoEntrega": "Envío a domicilio",
+    "codigoPostal": "5000",
+    "productos": [
+      {
+        "idProducto": 1,
+        "cantidad": 1
+      },
+      {
+        "idProducto": 4,
+        "cantidad": 1
+      },
+      {
+        "idProducto": 2,
+        "cantidad": 1
+      }
+    ]
+  },
+  {
+    "id": 8,
+    "idCliente": 8,
+    "fecha": "2026-10-21",
+    "estado": "Pendiente",
+    "total": 37000,
+    "metodoEntrega": "Envío a domicilio",
+    "codigoPostal": "5000",
+    "productos": [
+      {
+        "idProducto": 4,
+        "cantidad": 1
+      }
+    ]
+  },
+  {
+    "id": 9,
+    "idCliente": 9,
+    "fecha": "2026-10-21",
+    "estado": "Pendiente",
+    "total": 37000,
+    "metodoEntrega": "Retiro por el local",
+    "codigoPostal": "5000",
+    "productos": [
+      {
+        "idProducto": 4,
+        "cantidad": 1
+      }
+    ]
+  },
+  {
+    "id": 10,
+    "idCliente": 10,
+    "fecha": "2026-10-21",
+    "estado": "Pendiente",
+    "total": 37000,
+    "metodoEntrega": "Retiro por el local",
+    "codigoPostal": "5000",
+    "productos": [
+      {
+        "idProducto": 4,
+        "cantidad": 1
+      }
+    ]
+  },
+  {
+    "id": 11,
+    "idCliente": 11,
+    "fecha": "2026-10-21",
+    "estado": "Pendiente",
+    "total": 15000,
+    "metodoEntrega": "Retiro por el local",
+    "codigoPostal": "5000",
+    "productos": [
+      {
+        "idProducto": 5,
+        "cantidad": 1
+      }
+    ]
+  },
+  {
+    "id": 12,
+    "idCliente": 12,
+    "fecha": "2026-10-21",
+    "estado": "Pendiente",
+    "total": 24000,
+    "metodoEntrega": "Retiro por el local",
+    "codigoPostal": "5000",
+    "productos": [
+      {
+        "idProducto": 1,
+        "cantidad": 1
+      }
+    ]
+  },
+  {
+    "id": 13,
+    "idCliente": 13,
+    "fecha": "2026-10-21",
+    "estado": "Pendiente",
+    "total": 15000,
+    "metodoEntrega": "Retiro por el local",
+    "codigoPostal": "5000",
+    "productos": [
+      {
+        "idProducto": 5,
+        "cantidad": 1
+      }
+    ]
+  },
+  {
+    "id": 14,
+    "idCliente": 14,
+    "fecha": "2026-10-21",
+    "estado": "Pendiente",
+    "total": 15000,
+    "metodoEntrega": "Retiro por el local",
+    "codigoPostal": "5000",
+    "productos": [
+      {
+        "idProducto": 5,
+        "cantidad": 1
+      }
+    ]
+  },
+  {
+    "id": 15,
+    "idCliente": 15,
+    "fecha": "2026-10-21",
+    "estado": "Pendiente",
+    "total": 10000,
+    "metodoEntrega": "Retiro por el local",
+    "codigoPostal": "5000",
+    "productos": [
+      {
+        "idProducto": 6,
+        "cantidad": 1
+      }
+    ]
+  },
+  {
+    "id": 16,
+    "idCliente": 16,
+    "fecha": "2026-10-21",
+    "estado": "Pendiente",
+    "total": 25000,
+    "metodoEntrega": "Retiro por el local",
+    "codigoPostal": "5000",
+    "productos": [
+      {
+        "idProducto": 2,
+        "cantidad": 1
+      }
+    ]
+  },
+  {
+    "id": 17,
+    "idCliente": 17,
+    "fecha": "2026-10-21",
+    "estado": "Pendiente",
+    "total": 24000,
+    "metodoEntrega": "Retiro por el local",
+    "codigoPostal": "5000",
+    "productos": [
+      {
+        "idProducto": 1,
+        "cantidad": 1
+      }
+    ]
+  },
+  {
+    "id": 18,
+    "idCliente": 18,
+    "fecha": "2026-10-21",
+    "estado": "Pendiente",
+    "total": 40000,
+    "metodoEntrega": "Retiro por el local",
+    "codigoPostal": "sas",
+    "productos": [
+      {
+        "idProducto": 3,
+        "cantidad": 1
+      }
+    ]
+  },
+  {
+    "id": 19,
+    "idCliente": 19,
+    "fecha": "2026-10-21",
+    "estado": "Pendiente",
+    "total": 25000,
+    "metodoEntrega": "Retiro por el local",
+    "codigoPostal": "sas",
+    "productos": [
+      {
+        "idProducto": 2,
+        "cantidad": 1
+      }
+    ]
+  },
+  {
+    "id": 20,
+    "idCliente": 20,
+    "fecha": "2026-10-21",
+    "estado": "Pendiente",
+    "total": 37000,
+    "metodoEntrega": "Retiro por el local",
+    "codigoPostal": "sas",
+    "productos": [
+      {
+        "idProducto": 4,
+        "cantidad": 1
+      }
+    ]
+  },
+  {
+    "id": 21,
+    "idCliente": 21,
+    "fecha": "2026-10-21",
+    "estado": "Pendiente",
+    "total": 25000,
+    "metodoEntrega": "Envío a domicilio",
+    "codigoPostal": "5000",
+    "productos": [
+      {
+        "idProducto": 6,
+        "cantidad": 1
+      },
+      {
+        "idProducto": 5,
+        "cantidad": 1
+      }
+    ]
+  },
+  {
+    "id": 22,
+    "idCliente": 22,
+    "fecha": "2026-10-21",
+    "estado": "Pendiente",
+    "total": 75000,
+    "metodoEntrega": "Retiro por el local",
+    "codigoPostal": "5000",
+    "productos": [
+      {
+        "idProducto": 5,
+        "cantidad": 1
+      },
+      {
+        "idProducto": 6,
+        "cantidad": 1
+      },
+      {
+        "idProducto": 2,
+        "cantidad": 2
+      }
+    ]
+  },
+  {
+    "id": 23,
+    "idCliente": 23,
+    "fecha": "2026-10-21",
+    "estado": "Pendiente",
+    "total": 40000,
+    "metodoEntrega": "Retiro por el local",
+    "codigoPostal": "sas",
+    "productos": [
+      {
+        "idProducto": 3,
+        "cantidad": 1
+      }
+    ]
+  },
+  {
+    "id": 24,
+    "idCliente": 24,
+    "fecha": "2026-10-21",
+    "estado": "Pendiente",
+    "total": 15000,
+    "metodoEntrega": "Retiro por el local",
+    "codigoPostal": "5000",
+    "productos": [
+      {
+        "idProducto": 5,
+        "cantidad": 1
+      }
+    ]
+  },
+  {
+    "id": 25,
+    "idCliente": 25,
+    "fecha": "2026-10-21",
+    "estado": "Pendiente",
+    "total": 40000,
+    "metodoEntrega": "Retiro por el local",
+    "codigoPostal": "sas",
+    "productos": [
+      {
+        "idProducto": 3,
+        "cantidad": 1
+      }
+    ]
+  },
+  {
+    "id": 26,
+    "idCliente": 26,
+    "fecha": "2026-10-21",
+    "estado": "Pendiente",
+    "total": 37000,
+    "metodoEntrega": "Retiro por el local",
+    "codigoPostal": "5000",
+    "productos": [
+      {
+        "idProducto": 4,
+        "cantidad": 1
+      }
+    ]
+  },
+  {
+    "id": 27,
+    "idCliente": 27,
+    "fecha": "2026-10-21",
+    "estado": "Pendiente",
+    "total": 15000,
+    "metodoEntrega": "Retiro por el local",
+    "codigoPostal": "sas",
+    "productos": [
+      {
+        "idProducto": 5,
+        "cantidad": 1
+      }
+    ]
   }
 ]

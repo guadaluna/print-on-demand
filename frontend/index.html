@@ -55,12 +55,73 @@
             </button>
             <p id="mensaje-carrito" role="status"></p>
         </section>
-    </main>
+        
+    <section id="datos-cliente" class="seccion-carrito" hidden>
+        <h2>Datos para tu compra</h2>
+        <p>Completá tus datos para registrar el pedido.</p>
 
-    <footer>
-        <p>PrintOnDemand · Diseños que hablan de vos.</p>
-    </footer>
+        <form id="formulario-cliente">
+            <label for="nombre">Nombre</label>
+            <input
+                type="text"
+                id="nombre"
+                name="nombre"
+                required
+            >
 
-    <script src="js/app.js"></script>
+            <label for="apellido">Apellido</label>
+            <input
+                type="text"
+                id="apellido"
+                name="apellido"
+                required
+            >
+
+            <label for="email">Correo electrónico</label>
+            <input
+                type="email"
+                id="email"
+                name="email"
+                required
+            >
+
+            <label for="telefono">Teléfono</label>
+            <input
+                type="tel"
+                id="telefono"
+                name="telefono"
+                required
+            >
+            
+            <label for="metodoEntrega">Método de entrega</label>
+            <select id="metodoEntrega" name="metodoEntrega" required>
+                <option value="">Seleccioná una opción</option>
+                <option value="Retiro por el local">Retiro por el local</option>
+                <option value="Envío a domicilio">Envío a domicilio</option>
+            </select>
+
+            <label for="codigoPostal">Código postal</label>
+            <input
+                type="text"
+                id="codigoPostal"
+                name="codigoPostal"
+                required
+            >
+
+            <button type="submit" class="boton">
+                Confirmar compra
+            </button>
+
+            <p id="mensaje-compra" role="status"></p>
+        </form>
+    </section>
+
+        </main>
+
+        <footer>
+            <p>PrintOnDemand · Diseños que hablan de vos.</p>
+        </footer>
+
+        <script src="js/app.js"></script>
 </body>
 </html>

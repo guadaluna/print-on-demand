@@ -267,7 +267,6 @@ app.delete("/clientes/:id", async (req, res) => {
     }
 });
 
-//Iniciar el servidor
 app.listen(3000, () => {
     console.log("Servidor funcionando en http://localhost:3000");
 });

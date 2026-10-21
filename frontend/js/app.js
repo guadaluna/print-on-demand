@@ -8,6 +8,9 @@ const cantidadCarrito = document.getElementById("cantidad-carrito");
 const totalCarrito = document.getElementById("total-carrito");
 const botonFinalizar = document.getElementById("finalizar-compra");
 const mensajeCarrito = document.getElementById("mensaje-carrito");
+const seccionDatosCliente = document.getElementById("datos-cliente");
+const formularioCliente = document.getElementById("formulario-cliente");
+const mensajeCompra = document.getElementById("mensaje-compra");
 
 let productos = [];
 let carrito = cargarCarrito();
@@ -295,8 +298,130 @@ filtroCategoria.addEventListener("change", () => {
 });
 
 botonFinalizar.addEventListener("click", () => {
-    mensajeCarrito.textContent =
-        "El carrito funciona. En el próximo paso conectaremos la compra con el servidor.";
+    seccionDatosCliente.hidden = false;
+    mensajeCompra.textContent = "";
+
+    seccionDatosCliente.scrollIntoView({
+        behavior: "smooth",
+        block: "start"
+    });
+});
+
+formularioCliente.addEventListener("submit", async (evento) => {
+    evento.preventDefault();
+
+    if (carrito.length === 0) {
+        mensajeCompra.textContent = "El carrito está vacío.";
+        return;
+    }
+
+    const botonConfirmar = formularioCliente.querySelector(
+        'button[type="submit"]'
+    );
+
+    botonConfirmar.disabled = true;
+    mensajeCompra.textContent = "Procesando tu compra...";
+
+    try {
+        const datosFormulario = new FormData(formularioCliente);
+
+        // 1. Registrar al cliente
+        const respuestaCliente = await fetch(`${API_URL}/clientes`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                nombre: datosFormulario.get("nombre").trim(),
+                apellido: datosFormulario.get("apellido").trim(),
+                email: datosFormulario.get("email").trim(),
+                telefono: datosFormulario.get("telefono").trim()
+            })
+        });
+
+        const cliente = await respuestaCliente.json();
+
+        if (!respuestaCliente.ok) {
+            throw new Error(
+                cliente.mensaje || "No se pudo registrar al cliente."
+            );
+        }
+
+        const productosPedido = carrito.map(item => ({
+            idProducto: item.idProducto,
+            cantidad: item.cantidad
+        }));
+
+        const total = carrito.reduce((suma, item) => {
+            const producto = productos.find(
+                producto => producto.id === item.idProducto
+            );
+
+            if (!producto) {
+                throw new Error("Uno de los productos ya no existe.");
+            }
+
+            if (
+                !producto.disponible ||
+                item.cantidad > producto.stock
+            ) {
+                throw new Error(
+                    `No hay stock suficiente de ${producto.nombre}.`
+                );
+            }
+
+            return suma + producto.precio * item.cantidad;
+        }, 0);
+
+        const respuestaPedido = await fetch(`${API_URL}/pedidos`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                idCliente: cliente.id,
+                fecha: new Date().toISOString().slice(0, 10),
+                total,
+                metodoEntrega: datosFormulario.get("metodoEntrega"),
+                codigoPostal: datosFormulario.get("codigoPostal").trim(),
+                productos: productosPedido
+            })
+        });
+
+        const pedido = await respuestaPedido.json();
+
+        if (!respuestaPedido.ok) {
+            throw new Error(
+                pedido.mensaje || "No se pudo registrar el pedido."
+            );
+        }
+
+        mensajeCompra.textContent =
+        `¡Compra registrada! Tu número de pedido es ${pedido.id}.`;
+
+        carrito = [];
+        guardarCarrito();
+        mostrarCarrito();
+        formularioCliente.reset();
+
+        mensajeCompra.textContent =
+            `¡Compra registrada! Tu número de pedido es ${pedido.id}.`;
+
+        mensajeCarrito.textContent = "";
+
+        seccionDatosCliente.scrollIntoView({
+            behavior: "smooth",
+            block: "start"
+});
+
+    } catch (error) {
+        console.error("Error al finalizar la compra:", error);
+
+        mensajeCompra.textContent =
+            `No se pudo completar la compra: ${error.message}`;
+    } finally {
+        botonConfirmar.disabled = false;
+    }
 });
 
 cargarProductos();
