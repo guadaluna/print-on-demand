@@ -19,6 +19,115 @@
     </header>
 
     <main>
+
+    <!-- Autenticación -->
+    <section id="cuenta" class="seccion-autenticacion">
+
+        <div class="contenedor-autenticacion">
+
+            <div id="estado-sesion" hidden>
+                <p id="mensaje-sesion"></p>
+                <button type="button" id="cerrar-sesion" class="boton">
+                    Cerrar sesión
+                </button>
+            </div>
+
+            <!-- Inicio de sesión -->
+            <div id="seccion-login">
+                <h2>Iniciar sesión</h2>
+                <p>Ingresá a tu cuenta para realizar una compra.</p>
+
+                <form id="formulario-login" class="formulario-autenticacion">
+
+                    <label for="login-email">Correo electrónico</label>
+                    <input
+                        type="email"
+                        id="login-email"
+                        name="email"
+                        required
+                    >
+
+                    <label for="login-password">Contraseña</label>
+                    <input
+                        type="password"
+                        id="login-password"
+                        name="password"
+                        required
+                    >
+
+                    <button type="submit" class="boton">
+                        Iniciar sesión
+                    </button>
+
+                    <p id="mensaje-login" class="mensaje-autenticacion" role="status"></p>
+                </form>
+                <button type="button" id="mostrar-registro">
+                    ¿No tenés cuenta? Registrate
+                </button>
+            </div>
+
+            <!-- Registro -->
+            <div id="seccion-registro" hidden>
+                <h2>Crear cuenta</h2>
+                <p>Registrate para poder realizar tus compras.</p>
+
+                <form id="formulario-registro" class="formulario-autenticacion">
+
+                    <label for="registro-nombre">Nombre</label>
+                    <input
+                        type="text"
+                        id="registro-nombre"
+                        name="nombre"
+                        required
+                    >
+
+                    <label for="registro-apellido">Apellido</label>
+                    <input
+                        type="text"
+                        id="registro-apellido"
+                        name="apellido"
+                        required
+                    >
+
+                    <label for="registro-email">Correo electrónico</label>
+                    <input
+                        type="email"
+                        id="registro-email"
+                        name="email"
+                        required
+                    >
+
+                    <label for="registro-telefono">Teléfono</label>
+                    <input
+                        type="tel"
+                        id="registro-telefono"
+                        name="telefono"
+                        required
+                    >
+
+                    <label for="registro-password">Contraseña</label>
+                    <input
+                        type="password"
+                        id="registro-password"
+                        name="password"
+                        required
+                        minlength="6"
+                    >
+
+                    <button type="submit" class="boton">
+                        Crear cuenta
+                    </button>
+
+                    <p id="mensaje-registro" class="mensaje-autenticacion" role="status"></p>
+                </form>
+                <button type="button" id="mostrar-login">
+                    ¿Ya tenés cuenta? Iniciá sesión
+                </button>
+            </div>
+
+        </div>
+    </section>
+
         <section class="portada">
             <p class="etiqueta">TU ESTILO, TU DISEÑO</p>
             <h1>Diseñá tu estilo.<br>Hacelo realidad.</h1>
@@ -56,65 +165,66 @@
             <p id="mensaje-carrito" role="status"></p>
         </section>
         
-    <section id="datos-cliente" class="seccion-carrito" hidden>
-        <h2>Datos para tu compra</h2>
-        <p>Completá tus datos para registrar el pedido.</p>
+    
+    <section id="datos-cliente" class="seccion-carrito seccion-checkout" hidden>
+        <div class="contenedor-checkout">
 
-        <form id="formulario-cliente">
-            <label for="nombre">Nombre</label>
-            <input
-                type="text"
-                id="nombre"
-                name="nombre"
-                required
-            >
+            <div class="encabezado-checkout">
+                <p class="etiqueta">ÚLTIMO PASO</p>
+                <h2>Finalizar compra</h2>
+                <p>Completá tus datos para que podamos preparar tu pedido.</p>
+            </div>
 
-            <label for="apellido">Apellido</label>
-            <input
-                type="text"
-                id="apellido"
-                name="apellido"
-                required
-            >
+            <form id="formulario-cliente" class="formulario-checkout">
 
-            <label for="email">Correo electrónico</label>
-            <input
-                type="email"
-                id="email"
-                name="email"
-                required
-            >
+                <div class="campos-checkout">
 
-            <label for="telefono">Teléfono</label>
-            <input
-                type="tel"
-                id="telefono"
-                name="telefono"
-                required
-            >
-            
-            <label for="metodoEntrega">Método de entrega</label>
-            <select id="metodoEntrega" name="metodoEntrega" required>
-                <option value="">Seleccioná una opción</option>
-                <option value="Retiro por el local">Retiro por el local</option>
-                <option value="Envío a domicilio">Envío a domicilio</option>
-            </select>
+                    <div class="campo-checkout">
+                        <label for="nombre">Nombre</label>
+                        <input type="text" id="nombre" name="nombre" required>
+                    </div>
 
-            <label for="codigoPostal">Código postal</label>
-            <input
-                type="text"
-                id="codigoPostal"
-                name="codigoPostal"
-                required
-            >
+                    <div class="campo-checkout">
+                        <label for="apellido">Apellido</label>
+                        <input type="text" id="apellido" name="apellido" required>
+                    </div>
 
-            <button type="submit" class="boton">
-                Confirmar compra
-            </button>
+                    <div class="campo-checkout">
+                        <label for="email">Correo electrónico</label>
+                        <input type="email" id="email" name="email" required>
+                    </div>
 
-            <p id="mensaje-compra" role="status"></p>
-        </form>
+                    <div class="campo-checkout">
+                        <label for="telefono">Teléfono</label>
+                        <input type="tel" id="telefono" name="telefono" required>
+                    </div>
+
+                    <div class="campo-checkout">
+                        <label for="metodoEntrega">Método de entrega</label>
+                        <select id="metodoEntrega" name="metodoEntrega" required>
+                            <option value="">Seleccioná una opción</option>
+                            <option value="Retiro por el local">Retiro por el local</option>
+                            <option value="Envío a domicilio">Envío a domicilio</option>
+                        </select>
+                    </div>
+
+                    <div class="campo-checkout">
+                        <label for="codigoPostal">Código postal</label>
+                        <input type="text" id="codigoPostal" name="codigoPostal" required>
+                    </div>
+
+                </div>
+
+                <button type="submit" class="boton boton-checkout">
+                    Confirmar compra
+                </button>
+
+                <p id="mensaje-compra" role="status"></p>
+
+            </form>
+        </div>
     </section>
+
 
         </main>
 

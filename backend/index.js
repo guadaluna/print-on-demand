@@ -1,91 +1,112 @@
-
 import express from "express";
-import fs from "node:fs/promises";
 import cors from "cors";
+import dotenv from "dotenv";
+import conectarDB from "./config/database.js";
+import Producto from "./models/producto.js";
+import Cliente from "./models/cliente.js";
+import Pedido from "./models/pedido.js";
+import Usuario from "./models/usuario.js";
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
 
+dotenv.config();
 const app = express();
 
 app.use(cors());
 app.use(express.json());
 
-const productos = JSON.parse(
-    await fs.readFile("productos.json", "utf-8")
-);
+function verificarToken(req, res, next) {
+    // Obtener el token del encabezado Authorization
+    const authHeader = req.headers.authorization;
 
-const clientes = JSON.parse(
-    await fs.readFile("clientes.json", "utf-8")
-);
+    if (!authHeader) {
+        return res.status(401).json({
+            mensaje: "No se proporcionó un token"
+        });
+    }
 
-const pedidos = JSON.parse(
-    await fs.readFile("pedidos.json", "utf-8")
-);
+    // Separar la palabra Bearer del token
+    const token = authHeader.split(" ")[1];
 
-async function guardarJSON(archivo, datos) {
-    await fs.writeFile(
-        archivo,
-        JSON.stringify(datos, null, 2),
-        "utf-8"
-    );
-}
+    try {
+        // Verificar que el token sea válido
+        const usuario = jwt.verify(token, process.env.JWT_SECRET);
 
-function siguienteId(datos) {
-    return datos.reduce(
-        (mayor, elemento) => Math.max(mayor, elemento.id),
-        0
-    ) + 1;
+        req.usuario = usuario;
+
+        next();
+
+    } catch (error) {
+        return res.status(403).json({
+            mensaje: "Token inválido o vencido"
+        });
+    }
 }
 
 app.get("/", (req, res) => {
     res.send("API PrintOnDemand funcionando correctamente");
 });
 
-app.get("/productos", (req, res) => {
-    res.json(productos);
-});
+app.get("/productos", async (req, res) => {
+    try {
+        const productos = await Producto.find();
 
-app.get("/productos/:id", (req, res) => {
-    const id = Number(req.params.id);
-
-    const producto = productos.find(
-        producto => producto.id === id
-    );
-
-    if (!producto) {
-        return res.status(404).json({
-            mensaje: "Producto no encontrado"
+        res.json(productos);
+    } catch (error) {
+        res.status(500).json({
+            mensaje: "Error al obtener los productos"
         });
     }
+});
 
-    res.json(producto);
+app.get("/productos/:id", async (req, res) => {
+    try {
+        const id = Number(req.params.id);
+
+        const producto = await Producto.findOne({ id });
+
+        if (!producto) {
+            return res.status(404).json({
+                mensaje: "Producto no encontrado"
+            });
+        }
+
+        res.json(producto);
+    } catch (error) {
+        res.status(500).json({
+            mensaje: "Error al obtener el producto"
+        });
+    }
 });
 
 
 app.post("/clientes", async (req, res) => {
-    const { nombre, apellido, email, telefono } = req.body;
-
-    if (!nombre || !apellido || !email || !telefono) {
-        return res.status(400).json({
-            mensaje: "Todos los datos del cliente son obligatorios"
-        });
-    }
-
-    const nuevoCliente = {
-        id: siguienteId(clientes),
-        nombre,
-        apellido,
-        email,
-        telefono,
-        activo: true
-    };
-
-    clientes.push(nuevoCliente);
-
     try {
-        await guardarJSON("clientes.json", clientes);
+        const { nombre, apellido, email, telefono } = req.body;
+
+        if (!nombre || !apellido || !email || !telefono) {
+            return res.status(400).json({
+                mensaje: "Todos los datos del cliente son obligatorios"
+            });
+        }
+
+        const ultimoCliente = await Cliente.findOne().sort({ id: -1 });
+
+        const nuevoCliente = new Cliente({
+            id: ultimoCliente ? ultimoCliente.id + 1 : 1,
+            nombre,
+            apellido,
+            email,
+            telefono,
+            activo: true
+        });
+
+        await nuevoCliente.save();
 
         res.status(201).json(nuevoCliente);
+
     } catch (error) {
-        clientes.pop();
+        console.error("Error al registrar el cliente:", error);
 
         res.status(500).json({
             mensaje: "Error al guardar el cliente"
@@ -93,226 +114,398 @@ app.post("/clientes", async (req, res) => {
     }
 });
 
-app.post("/pedidos", async (req, res) => {
-    const {
-        idCliente,
-        fecha,
-        total,
-        metodoEntrega,
-        codigoPostal,
-        productos: productosPedido
-    } = req.body;
+app.post("/usuarios/registro", async (req, res) => {
+    try {
+        const { nombre, apellido, email, telefono, password } = req.body;
 
-    const clienteExiste = clientes.some(
-        cliente => cliente.id === Number(idCliente)
-    );
+        // Verificar que todos los datos estén completos
+        if (!nombre || !apellido || !email || !telefono || !password) {
+            return res.status(400).json({
+                mensaje: "Todos los campos son obligatorios"
+            });
+        }
 
-    if (!Number.isInteger(Number(idCliente)) || !clienteExiste) {
-        return res.status(400).json({
-            mensaje: "El cliente indicado no existe"
+        // Verificar si el email ya está registrado
+        const usuarioExiste = await Usuario.findOne({
+            email: email.toLowerCase().trim()
+        });
+
+        if (usuarioExiste) {
+            return res.status(409).json({
+                mensaje: "El email ya está registrado"
+            });
+        }
+
+        // Encriptar la contraseña
+        const passwordEncriptada = await bcrypt.hash(password, 10);
+
+        // Crear el nuevo usuario
+        const nuevoUsuario = new Usuario({
+            nombre,
+            apellido,
+            email,
+            telefono,
+            password: passwordEncriptada
+        });
+
+        await nuevoUsuario.save();
+
+        res.status(201).json({
+            mensaje: "Usuario registrado correctamente",
+            usuario: {
+                id: nuevoUsuario._id,
+                nombre: nuevoUsuario.nombre,
+                apellido: nuevoUsuario.apellido,
+                email: nuevoUsuario.email
+            }
+        });
+
+    } catch (error) {
+        console.error("Error al registrar el usuario:", error);
+
+        res.status(500).json({
+            mensaje: "Error al registrar el usuario"
         });
     }
+});
 
-    if (
-        !Array.isArray(productosPedido) ||
-        productosPedido.length === 0
-    ) {
-        return res.status(400).json({
-            mensaje: "El pedido debe incluir productos"
+app.post("/usuarios/login", async (req, res) => {
+    try {
+        const { email, password } = req.body;
+
+        // Verificar que se hayan ingresado los datos
+        if (!email || !password) {
+            return res.status(400).json({
+                mensaje: "El email y la contraseña son obligatorios"
+            });
+        }
+
+        // Buscar el usuario
+        const usuario = await Usuario.findOne({
+            email: email.toLowerCase().trim()
         });
-    }
 
-    const productosValidos = productosPedido.every(item =>
-        Number.isInteger(Number(item.idProducto)) &&
-        productos.some(
-            producto => producto.id === Number(item.idProducto)
-        ) &&
-        Number.isInteger(item.cantidad) &&
-        item.cantidad > 0
-    );
+        if (!usuario) {
+            return res.status(401).json({
+                mensaje: "Email o contraseña incorrectos"
+            });
+        }
 
-    if (!productosValidos) {
-        return res.status(400).json({
-            mensaje: "Hay productos inexistentes o cantidades inválidas"
-        });
-    }
-
-    const stockDisponible = productosPedido.every(item => {
-    const producto = productos.find(
-        producto => producto.id === Number(item.idProducto)
-    );
-
-    return producto.disponible &&
-        item.cantidad <= producto.stock;
-    });
-
-    if (!stockDisponible) {
-        return res.status(400).json({
-            mensaje: "No hay stock suficiente para uno o más productos"
-        });
-    }
-
-    if (
-        typeof total !== "number" ||
-        !Number.isFinite(total) ||
-        total < 0 ||
-        !metodoEntrega
-    ) {
-        return res.status(400).json({
-            mensaje: "El total y el método de entrega son obligatorios"
-        });
-    }
-
-    const productosOriginales = JSON.parse(JSON.stringify(productos));
-
-    const nuevoPedido = {
-        id: siguienteId(pedidos),
-        idCliente: Number(idCliente),
-        fecha: fecha || new Date().toISOString().slice(0, 10),
-        estado: "Pendiente",
-        total,
-        metodoEntrega,
-        codigoPostal: codigoPostal || "",
-        productos: productosPedido.map(item => ({
-            idProducto: Number(item.idProducto),
-            cantidad: item.cantidad
-        }))
-    };
-
-    productosPedido.forEach(item => {
-        const producto = productos.find(
-            producto => producto.id === Number(item.idProducto)
+        // Comparar la contraseña ingresada con la encriptada
+        const passwordValida = await bcrypt.compare(
+            password,
+            usuario.password
         );
 
-        producto.stock -= item.cantidad;
-    });
+        if (!passwordValida) {
+            return res.status(401).json({
+                mensaje: "Email o contraseña incorrectos"
+            });
+        }
 
-    pedidos.push(nuevoPedido);
+        // Generar token JWT
+        const token = jwt.sign(
+            {
+                id: usuario._id,
+                email: usuario.email
+            },
+            process.env.JWT_SECRET,
+            { expiresIn: "2h" }
+        );
 
+        res.json({
+            mensaje: "Inicio de sesión correcto",
+            token,
+            usuario: {
+                id: usuario._id,
+                nombre: usuario.nombre,
+                apellido: usuario.apellido,
+                email: usuario.email
+            }
+        });
+
+    } catch (error) {
+        console.error("Error al iniciar sesión:", error);
+
+        res.status(500).json({
+            mensaje: "Error al iniciar sesión"
+        });
+    }
+});
+
+app.get("/clientes", async (req, res) => {
     try {
-        await guardarJSON("productos.json", productos);
-        await guardarJSON("pedidos.json", pedidos);
+        const clientes = await Cliente.find();
+
+        res.json(clientes);
+
+    } catch (error) {
+        console.error("Error al obtener los clientes:", error);
+
+        res.status(500).json({
+            mensaje: "Error al obtener los clientes"
+        });
+    }
+});
+
+
+app.post("/pedidos", verificarToken, async (req, res) => {
+    try {
+        const {
+            idCliente,
+            fecha,
+            total,
+            metodoEntrega,
+            codigoPostal,
+            productos: productosPedido
+        } = req.body;
+
+        // Verificar que el cliente exista
+        const clienteExiste = await Cliente.findOne({
+            id: Number(idCliente)
+        });
+
+        if (!Number.isInteger(Number(idCliente)) || !clienteExiste) {
+            return res.status(400).json({
+                mensaje: "El cliente indicado no existe"
+            });
+        }
+
+        // Verificar que el pedido tenga productos
+        if (
+            !Array.isArray(productosPedido) ||
+            productosPedido.length === 0
+        ) {
+            return res.status(400).json({
+                mensaje: "El pedido debe incluir productos"
+            });
+        }
+
+        // Verificar cantidades e IDs
+        const productosValidos = productosPedido.every(item =>
+            Number.isInteger(Number(item.idProducto)) &&
+            Number.isInteger(item.cantidad) &&
+            item.cantidad > 0
+        );
+
+        if (!productosValidos) {
+            return res.status(400).json({
+                mensaje: "Hay productos inexistentes o cantidades inválidas"
+            });
+        }
+
+        // Agrupar las cantidades por producto
+        const cantidadesPorProducto = {};
+
+        for (const item of productosPedido) {
+            const idProducto = Number(item.idProducto);
+
+            cantidadesPorProducto[idProducto] =
+                (cantidadesPorProducto[idProducto] || 0) + item.cantidad;
+        }
+
+        // Comprobar existencia y stock en MongoDB
+        const productosAActualizar = [];
+
+        for (const idProducto in cantidadesPorProducto) {
+            const producto = await Producto.findOne({
+                id: Number(idProducto)
+            });
+
+            const cantidad = cantidadesPorProducto[idProducto];
+
+            if (!producto) {
+                return res.status(400).json({
+                    mensaje: "Hay productos inexistentes en el pedido"
+                });
+            }
+
+            if (!producto.disponible || cantidad > producto.stock) {
+                return res.status(400).json({
+                    mensaje: "No hay stock suficiente para uno o más productos"
+                });
+            }
+
+            productosAActualizar.push({
+                producto,
+                cantidad
+            });
+        }
+
+        // Validar total y método de entrega
+        if (
+            typeof total !== "number" ||
+            !Number.isFinite(total) ||
+            total < 0 ||
+            !metodoEntrega
+        ) {
+            return res.status(400).json({
+                mensaje: "El total y el método de entrega son obligatorios"
+            });
+        }
+
+        // Obtener el siguiente ID
+        const ultimoPedido = await Pedido.findOne().sort({ id: -1 });
+
+        const nuevoPedido = new Pedido({
+            id: ultimoPedido ? ultimoPedido.id + 1 : 1,
+            idCliente: Number(idCliente),
+            fecha: fecha || new Date().toISOString().slice(0, 10),
+            estado: "Pendiente",
+            total,
+            metodoEntrega,
+            codigoPostal: codigoPostal || "",
+            productos: productosPedido.map(item => ({
+                idProducto: Number(item.idProducto),
+                cantidad: item.cantidad
+            }))
+        });
+
+        // Actualizar el stock en MongoDB
+        for (const item of productosAActualizar) {
+            item.producto.stock -= item.cantidad;
+            await item.producto.save();
+        }
+
+        // Guardar el pedido en MongoDB
+        await nuevoPedido.save();
 
         res.status(201).json(nuevoPedido);
-    } catch (error) {
-        productos.splice(0, productos.length, ...productosOriginales);
-        pedidos.pop();
 
-        try {
-            await guardarJSON("productos.json", productos);
-            await guardarJSON("pedidos.json", pedidos);
-        } catch (errorRestauracion) {
-            console.error("Error al restaurar los archivos JSON:", errorRestauracion);
-        }
+    } catch (error) {
+        console.error("Error al registrar el pedido:", error);
 
         res.status(500).json({
             mensaje: "Error al guardar el pedido o actualizar el stock"
         });
     }
+});
 
+app.get("/pedidos", async (req, res) => {
     try {
-        await guardarJSON("pedidos.json", pedidos);
+        const pedidos = await Pedido.find();
 
-        res.status(201).json(nuevoPedido);
+        res.json(pedidos);
+
     } catch (error) {
-        pedidos.pop();
+        console.error("Error al obtener los pedidos:", error);
 
         res.status(500).json({
-            mensaje: "Error al guardar el pedido"
+            mensaje: "Error al obtener los pedidos"
+        });
+    }
+});
+
+app.get("/pedidos/:id", async (req, res) => {
+    try {
+        const id = Number(req.params.id);
+
+        const pedido = await Pedido.findOne({ id });
+
+        if (!pedido) {
+            return res.status(404).json({
+                mensaje: "Pedido no encontrado"
+            });
+        }
+
+        res.json(pedido);
+
+    } catch (error) {
+        console.error("Error al obtener el pedido:", error);
+
+        res.status(500).json({
+            mensaje: "Error al obtener el pedido"
         });
     }
 });
 
 app.put("/productos/:id", async (req, res) => {
-    const id = Number(req.params.id);
-
-    const producto = productos.find(
-        producto => producto.id === id
-    );
-
-    if (!producto) {
-        return res.status(404).json({
-            mensaje: "Producto no encontrado"
-        });
-    }
-
-    const { nombre, precio, stock, disponible } = req.body;
-
-    if (
-        (precio !== undefined &&
-            (typeof precio !== "number" || precio < 0)) ||
-        (stock !== undefined &&
-            (!Number.isInteger(stock) || stock < 0)) ||
-        (nombre !== undefined &&
-            (typeof nombre !== "string" || !nombre.trim())) ||
-        (disponible !== undefined &&
-            typeof disponible !== "boolean")
-    ) {
-        return res.status(400).json({
-            mensaje: "Los datos del producto no son válidos"
-        });
-    }
-
-    const anterior = { ...producto };
-
-    if (nombre !== undefined) producto.nombre = nombre;
-    if (precio !== undefined) producto.precio = precio;
-    if (stock !== undefined) producto.stock = stock;
-    if (disponible !== undefined) producto.disponible = disponible;
-
     try {
-        await guardarJSON("productos.json", productos);
+        const id = Number(req.params.id);
+
+        const producto = await Producto.findOne({ id });
+
+        if (!producto) {
+            return res.status(404).json({
+                mensaje: "Producto no encontrado"
+            });
+        }
+
+        const { nombre, precio, stock, disponible } = req.body;
+
+        if (
+            (precio !== undefined &&
+                (typeof precio !== "number" || precio < 0)) ||
+            (stock !== undefined &&
+                (!Number.isInteger(stock) || stock < 0)) ||
+            (nombre !== undefined &&
+                (typeof nombre !== "string" || !nombre.trim())) ||
+            (disponible !== undefined &&
+                typeof disponible !== "boolean")
+        ) {
+            return res.status(400).json({
+                mensaje: "Los datos del producto no son válidos"
+            });
+        }
+
+        if (nombre !== undefined) producto.nombre = nombre;
+        if (precio !== undefined) producto.precio = precio;
+        if (stock !== undefined) producto.stock = stock;
+        if (disponible !== undefined) producto.disponible = disponible;
+
+        await producto.save();
 
         res.json(producto);
+
     } catch (error) {
-        Object.assign(producto, anterior);
+        console.error("Error al actualizar el producto:", error);
 
         res.status(500).json({
-            mensaje: "Error al guardar el producto"
+            mensaje: "Error al actualizar el producto"
         });
     }
 });
 
+
 app.delete("/clientes/:id", async (req, res) => {
-    const id = Number(req.params.id);
-
-    const indice = clientes.findIndex(
-        cliente => cliente.id === id
-    );
-
-    if (indice === -1) {
-        return res.status(404).json({
-            mensaje: "Cliente no encontrado"
-        });
-    }
-
-    const tienePedidos = pedidos.some(
-        pedido => pedido.idCliente === id
-    );
-
-    if (tienePedidos) {
-        return res.status(400).json({
-            mensaje: "No se puede eliminar el cliente porque tiene pedidos asociados"
-        });
-    }
-
-    const [clienteEliminado] = clientes.splice(indice, 1);
-
     try {
-        await guardarJSON("clientes.json", clientes);
+        const id = Number(req.params.id);
+
+        const cliente = await Cliente.findOne({ id });
+
+        if (!cliente) {
+            return res.status(404).json({
+                mensaje: "Cliente no encontrado"
+            });
+        }
+
+        const tienePedidos = await Pedido.exists({
+            idCliente: id
+        });
+
+        if (tienePedidos) {
+            return res.status(400).json({
+                mensaje: "No se puede eliminar el cliente porque tiene pedidos asociados"
+            });
+        }
+
+        await Cliente.deleteOne({ id });
 
         res.json({
             mensaje: "Cliente eliminado correctamente"
         });
+
     } catch (error) {
-        clientes.splice(indice, 0, clienteEliminado);
+        console.error("Error al eliminar el cliente:", error);
 
         res.status(500).json({
-            mensaje: "Error al guardar la eliminación"
+            mensaje: "Error al eliminar el cliente"
         });
     }
 });
 
-app.listen(3000, () => {
-    console.log("Servidor funcionando en http://localhost:3000");
+conectarDB().then(() => {
+    app.listen(3000, () => {
+        console.log("Servidor funcionando en http://localhost:3000");
+    });
 });

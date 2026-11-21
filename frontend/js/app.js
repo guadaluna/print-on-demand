@@ -12,8 +12,153 @@ const seccionDatosCliente = document.getElementById("datos-cliente");
 const formularioCliente = document.getElementById("formulario-cliente");
 const mensajeCompra = document.getElementById("mensaje-compra");
 
+const formularioLogin = document.getElementById("formulario-login");
+const formularioRegistro = document.getElementById("formulario-registro");
+const mensajeLogin = document.getElementById("mensaje-login");
+const mensajeRegistro = document.getElementById("mensaje-registro");
+const seccionLogin = document.getElementById("seccion-login");
+const seccionRegistro = document.getElementById("seccion-registro");
+const estadoSesion = document.getElementById("estado-sesion");
+const mensajeSesion = document.getElementById("mensaje-sesion");
+const botonCerrarSesion = document.getElementById("cerrar-sesion");
+const botonMostrarRegistro = document.getElementById("mostrar-registro");
+const botonMostrarLogin = document.getElementById("mostrar-login");
+
+
 let productos = [];
 let carrito = cargarCarrito();
+
+
+formularioRegistro.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    mensajeRegistro.textContent = "Registrando cuenta...";
+
+    const datos = new FormData(formularioRegistro);
+
+    const nuevoUsuario = {
+        nombre: datos.get("nombre"),
+        apellido: datos.get("apellido"),
+        email: datos.get("email"),
+        telefono: datos.get("telefono"),
+        password: datos.get("password")
+    };
+
+    try {
+        const respuesta = await fetch(`${API_URL}/usuarios/registro`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(nuevoUsuario)
+        });
+
+        const resultado = await respuesta.json();
+
+        if (!respuesta.ok) {
+            throw new Error(resultado.mensaje || "No se pudo registrar la cuenta.");
+        }
+
+        mensajeRegistro.textContent = "¡Cuenta creada correctamente! Ahora podés iniciar sesión.";
+
+        formularioRegistro.reset();
+
+        // Completar automáticamente el correo en el inicio de sesión
+        document.getElementById("login-email").value = nuevoUsuario.email;
+
+    } catch (error) {
+        mensajeRegistro.textContent = error.message;
+    }
+});
+
+
+formularioLogin.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    mensajeLogin.textContent = "Iniciando sesión...";
+
+    const datos = new FormData(formularioLogin);
+
+    const credenciales = {
+        email: datos.get("email"),
+        password: datos.get("password")
+    };
+
+    try {
+        const respuesta = await fetch(`${API_URL}/usuarios/login`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(credenciales)
+        });
+
+        const resultado = await respuesta.json();
+
+        if (!respuesta.ok) {
+            throw new Error(resultado.mensaje || "No se pudo iniciar sesión.");
+        }
+
+        // Guardar el token y los datos del usuario
+        localStorage.setItem("token", resultado.token);
+        localStorage.setItem("usuario", JSON.stringify(resultado.usuario));
+
+        mensajeLogin.textContent = "¡Inicio de sesión exitoso!";
+
+        actualizarSesion();
+
+        formularioLogin.reset();
+
+    } catch (error) {
+        mensajeLogin.textContent = error.message;
+    }
+});
+
+
+function actualizarSesion() {
+    const token = localStorage.getItem("token");
+    const usuarioGuardado = localStorage.getItem("usuario");
+
+    if (token && usuarioGuardado) {
+        const usuario = JSON.parse(usuarioGuardado);
+
+        // Ocultar los formularios
+        seccionLogin.hidden = true;
+        seccionRegistro.hidden = true;
+
+        // Mostrar el usuario conectado
+        estadoSesion.hidden = false;
+        mensajeSesion.textContent = `Hola, ${usuario.nombre} ${usuario.apellido}`;
+    } else {
+        // Mostrar los formularios
+        seccionLogin.hidden = false;
+        seccionRegistro.hidden = true;
+
+        // Ocultar el estado de sesión
+        estadoSesion.hidden = true;
+    }
+}
+
+
+botonMostrarRegistro.addEventListener("click", () => {
+    seccionLogin.hidden = true;
+    seccionRegistro.hidden = false;
+});
+
+botonMostrarLogin.addEventListener("click", () => {
+    seccionRegistro.hidden = true;
+    seccionLogin.hidden = false;
+});
+
+
+
+botonCerrarSesion.addEventListener("click", () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("usuario");
+
+    actualizarSesion();
+});
+
 
 function cargarCarrito() {
     try {
@@ -375,7 +520,8 @@ formularioCliente.addEventListener("submit", async (evento) => {
         const respuestaPedido = await fetch(`${API_URL}/pedidos`, {
             method: "POST",
             headers: {
-                "Content-Type": "application/json"
+                "Content-Type": "application/json",
+                "Authorization": `Bearer ${localStorage.getItem("token")}`
             },
             body: JSON.stringify({
                 idCliente: cliente.id,
@@ -425,3 +571,4 @@ formularioCliente.addEventListener("submit", async (evento) => {
 
 cargarProductos();
 
+actualizarSesion();
